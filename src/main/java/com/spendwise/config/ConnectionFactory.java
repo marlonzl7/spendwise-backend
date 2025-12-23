@@ -10,14 +10,10 @@ public class ConnectionFactory {
     private static final String PASSWORD = "senha1234@A";
 
     public static Connection getConnection() throws SQLException {
-
         try {
             return DriverManager.getConnection(URL, USER, PASSWORD);
-        }catch (SQLException e){
+        } catch (SQLException e) {
             throw new SQLException(e);
-
         }
     }
 }
-
-
