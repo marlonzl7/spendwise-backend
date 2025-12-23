@@ -11,6 +11,7 @@ import java.sql.SQLException;
 public class SpendDAO {
     public void save(Spend spend){
         String sql = "INSERT INTO spends(date_spend, description_spend, category_spend, value_spend, type_spend) VALUES (?, ?, ?, ?, ?)";
+
         try (Connection connection = ConnectionFactory.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
@@ -25,6 +26,5 @@ public class SpendDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
