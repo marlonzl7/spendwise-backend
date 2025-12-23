@@ -2,15 +2,16 @@ package com.spendwise;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.spendwise.dto.SpendInputDTO;
+import com.spendwise.enums.Type;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelReader {
@@ -29,35 +30,51 @@ public class ExcelReader {
         reader.readFromExcelFile();
     }
 
-    private void readFromExcelFile() throws IOException {
-        for (Row row : sheet) {
-            System.out.println();
+    private List<SpendInputDTO> readFromExcelFile() throws IOException {
+        List<SpendInputDTO> spends = new ArrayList<>();
 
-            for (Cell cell : row) {
-                printCellValue(cell);
-                System.out.print("\t");
+        for (Row row : sheet) {
+            if (row.getRowNum() == 0) {
+                continue;
             }
+
+            Cell dateCell = row.getCell(0);
+            Cell descCell = row.getCell(1);
+            Cell categoryCell = row.getCell(2);
+            Cell valueCell = row.getCell(3);
+            Cell typeCell = row.getCell(4);
+
+            LocalDate date = null;
+            String description = "";
+            String category = "";
+            BigDecimal value = BigDecimal.ZERO;
+            Type type = Type.INPUT;
+
+            if (dateCell != null && DateUtil.isCellDateFormatted(dateCell)) {
+                date = dateCell.getLocalDateTimeCellValue().toLocalDate();
+            }
+
+            if (descCell != null) {
+                description = descCell.getStringCellValue().trim();
+            }
+
+            if (categoryCell != null) {
+                category = categoryCell.getStringCellValue().trim();
+            }
+
+            if (valueCell != null) {
+                value = BigDecimal.valueOf(valueCell.getNumericCellValue());
+            }
+
+            if (typeCell != null) {
+                type = Type.valueOf(typeCell.getStringCellValue().toUpperCase());
+            }
+
+            spends.add(new SpendInputDTO(date, description, category, value, type));
         }
 
         workbook.close();
+
+        return spends;
     }
-
-    private void printCellValue(Cell cell) {
-        switch (cell.getCellType()) {
-            case STRING:
-                System.out.print(cell.getStringCellValue());
-                break;
-            case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    System.out.print(new SimpleDateFormat("MM-dd-yyyy").format(cell.getDateCellValue()));
-                } else {
-                    System.out.print((int) cell.getNumericCellValue());
-                }
-
-                break;
-            default:
-                break;
-        }
-    }
-
 }
