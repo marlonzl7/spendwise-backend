@@ -19,18 +19,12 @@ public class ExcelReader {
     private final Workbook workbook;
     private final Sheet sheet;
 
-    private ExcelReader(File excelFile) throws InvalidFormatException, IOException {
+    public ExcelReader(File excelFile) throws InvalidFormatException, IOException {
         workbook = new XSSFWorkbook(excelFile);
         sheet = workbook.getSheetAt(0);
     }
 
-    public static void main(String[] args) throws InvalidFormatException, IOException {
-        File excelFile = Paths.get("").resolve("./planilhas/spendwise-planilha.xlsx").toFile();
-        ExcelReader reader = new ExcelReader(excelFile);
-        reader.readFromExcelFile();
-    }
-
-    private List<SpendInputDTO> readFromExcelFile() throws IOException {
+    public List<SpendInputDTO> readFromExcelFile() throws IOException {
         List<SpendInputDTO> spends = new ArrayList<>();
 
         for (Row row : sheet) {
